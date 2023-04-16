@@ -17,7 +17,7 @@ var (
 		startIP: "0.0.0.0",
 		endIP:   "0.0.0.0",
 	}
-	activeHost []string
+	activeHosts []string
 )
 
 func parseArgv() {

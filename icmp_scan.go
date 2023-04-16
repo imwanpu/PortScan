@@ -29,15 +29,15 @@ func icmpScan(concurrentLeve int) {
 	}
 
 	go func() {
-		for i := icmpCfg.startIP; isFormerIpNotLarger(i, icmpCfg.endIP); increase(i, 1) {
+		for i := icmpCfg.startIP; isFormerIpNotLarger(i, icmpCfg.endIP); i = increase(i, 1) {
 			ips <- i
 		}
 	}()
 
-	for i := icmpCfg.startIP; isFormerIpNotLarger(i, icmpCfg.endIP); increase(i, 1) {
+	for i := icmpCfg.startIP; isFormerIpNotLarger(i, icmpCfg.endIP); i = increase(i, 1) {
 		ip := <-results
 		if ip != "" {
-			activeHost = append(activeHost, ip)
+			activeHosts = append(activeHosts, ip)
 		}
 		_ = bar.Add(1)
 	}
@@ -45,8 +45,20 @@ func icmpScan(concurrentLeve int) {
 	close(ips)
 	close(results)
 
-	sort.Strings(activeHost)
-	fmt.Println("\n", activeHost)
+	sort.Strings(activeHosts)
+	sortActiveHost()
+	fmt.Println("\n", activeHosts)
+}
+
+func sortActiveHost() {
+	ipv4ActiveHost := make([]int, len(activeHosts))
+	for i, ip := range activeHosts {
+		ipv4ActiveHost[i] = int(ip2uint32(ip))
+	}
+	sort.Ints(ipv4ActiveHost)
+	for i, uip := range ipv4ActiveHost {
+		activeHosts[i] = uint32toIp(uint32(uip))
+	}
 }
 
 func icmpWorker(ips, results chan string) {
@@ -59,21 +71,10 @@ func icmpWorker(ips, results chan string) {
 		// cmd.Start() 为耗时操作, 时长可能会超过 10 秒
 		if err := cmd.Wait(); err != nil {
 			results <- ""
+			continue
 		}
 		results <- ip
 	}
-}
-
-func ping(ip string) error {
-	cmd := exec.Command("cmd", "/c", fmt.Sprintf("ping %s", ip))
-	if err := cmd.Start(); err != nil {
-		return err
-	}
-	// cmd.Start() 为耗时操作, 时长可能会超过 10 秒
-	if err := cmd.Wait(); err != nil {
-		return err
-	}
-	return nil
 }
 
 func increase(smallerIp string, step uint32) string {
@@ -117,6 +118,8 @@ func icmpArgvCheck() error {
 		return errors.New("start ip is larger than end ip")
 	}
 	return nil
+
+	// TODO: 添加并发数校验， 过高则修改至始终
 
 }
 
