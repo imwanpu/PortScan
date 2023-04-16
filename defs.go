@@ -13,7 +13,6 @@ type protocol int
 
 const (
 	tcp = iota
-	udp
 	ICMP
 )
 
@@ -21,8 +20,6 @@ func (p *protocol) String() string {
 	switch *p {
 	case tcp:
 		return "tcp"
-	case udp:
-		return "udp"
 	case ICMP:
 		return "ICMP"
 	default:
@@ -34,8 +31,6 @@ func (p *protocol) Set(s string) error {
 	switch s {
 	case "tcp":
 		*p = tcp
-	case "udp":
-		*p = udp
 	case "ICMP":
 		*p = ICMP
 	default:
