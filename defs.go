@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-type scanConfiguration struct {
+type tcpScanConfiguration struct {
 	ip                 string
 	startPort, endPort int
 }
@@ -44,38 +44,6 @@ func (p *protocol) Set(s string) error {
 	return nil
 }
 
-// _____________________________________________________________________________________________________________________
-type Gender int
-
-const (
-	Male Gender = iota
-	Female
-	Other
-)
-
-func (g *Gender) String() string {
-	switch *g {
-	case Male:
-		return "male"
-	case Female:
-		return "female"
-	case Other:
-		return "other"
-	default:
-		return "unknown"
-	}
-}
-
-func (g *Gender) Set(s string) error {
-	switch s {
-	case "male":
-		*g = Male
-	case "female":
-		*g = Female
-	case "other":
-		*g = Other
-	default:
-		return fmt.Errorf("invalid gender: %q", s)
-	}
-	return nil
+type icmpScanConfiguration struct {
+	startIP, endIP string
 }

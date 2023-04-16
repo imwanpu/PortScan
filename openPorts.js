@@ -1,8 +1,14 @@
 const net = require('net');
+const dgram = require('dgram')
 
+TcpStartPort = 1024
 
-for (let i = 1024; i < 1034; i++) {
+// 打开 10 个 tcp 端口
+numberOfTcpPort = 10
+for (let i = TcpStartPort; i < TcpStartPort + numberOfTcpPort; i++) {
     net.createServer().listen(i, () => {
-        console.log('Server is listening on port ' + i + '.');
+        console.log('Server is listening on TCP port ' + i + '.');
     })
 }
+
+
